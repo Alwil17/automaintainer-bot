@@ -10,7 +10,7 @@ export default (app: Probot) => {
     });
     await context.octokit.issues.createComment(issueComment);
   });
-  // TODO: refactor this method
+  // TODO: this should be refactored
   // This will run when a push event occurs
   // and will create an issue for each TODO found in the pushed files
   app.on("push", async (context) => {
