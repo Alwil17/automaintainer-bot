@@ -39,7 +39,11 @@ export default (app: Probot) => {
 
           for (let index = 0; index < lines.length; index++) {
             const line = lines[index];
-            if (line.includes("// TODO:") || line.includes("// TODO: ")) {
+            // Define the TODO identifier
+            // This is the identifier we are looking for in the comments
+            const todoIdentifier: string = "TODO:";
+            // Check if the line contains a TODO comment
+            if (line.includes(`// ${todoIdentifier}:`) || line.includes(`// ${todoIdentifier}: `)) {
               app.log.info(`TODO found at ${path}:${index + 1} - ${line.trim()}`);
 
               // Extract the TODO message after "TODO"
@@ -54,7 +58,7 @@ export default (app: Probot) => {
               const { data: issues } = await context.octokit.issues.listForRepo({
                 owner: repo.owner,
                 repo: repo.repo,
-                state: "all",
+                state: "open", // Check only open issues
                 per_page: 100,
                 // Search by title using filter on client side since API doesn't provide title filter
               });
