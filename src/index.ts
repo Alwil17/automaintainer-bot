@@ -1,6 +1,7 @@
 import { Probot } from "probot";
 
 export default (app: Probot) => {
+  app.log.info("Yay, my app is loaded");
   // This will run when the issue is opened
   // and will create a comment on the issue
   app.on("issues.opened", async (context) => {
@@ -16,11 +17,11 @@ export default (app: Probot) => {
     const repo = context.repo();
     const commits = context.payload.commits;
 
-    context.log.info(`Push received with ${commits.length} commits`);
+    app.log.info(`Push received with ${commits.length} commits`);
 
     for (const commit of commits) {
       const files = [...(commit.added || []), ...(commit.modified || [])];
-      context.log.info(`Commit ${commit.id} - files: ${files.join(", ")}`);
+      app.log.info(`Commit ${commit.id} - files: ${files.join(", ")}`);
 
       for (const path of files) {
         try {
@@ -38,7 +39,7 @@ export default (app: Probot) => {
 
           lines.forEach(async (line, index) => {
             if (line.includes("TODO")) {
-              context.log.info(`TODO found at ${path}:${index + 1} - ${line.trim()}`);
+              app.log.info(`TODO found at ${path}:${index + 1} - ${line.trim()}`);
 
               await context.octokit.issues.create({
                 owner: repo.owner,
@@ -49,7 +50,7 @@ export default (app: Probot) => {
             }
           });
         } catch (error) {
-          context.log.warn(`Failed to read ${path}: ${error}`);
+          app.log.warn(`Failed to read ${path}: ${error}`);
         }
       }
     }
