@@ -1,3 +1,10 @@
+import crypto from "crypto";
+
+function generateTodoHash(path: string, line: string): string {
+    const data = `${path}:${line.trim()}`;
+    return crypto.createHash("sha1").update(data).digest("hex");
+}
+
 /**
  * Processes a list of commits to identify and handle TODO comments in files.
  *
@@ -149,6 +156,7 @@ async function createIssueIfNotExists(
     commit: any
 ) {
     try {
+        const todoHash = generateTodoHash(path, line);
         // Check if an issue with this title already exists
         const { data: issues } = await context.octokit.issues.listForRepo({
             owner: repo.owner,
@@ -158,19 +166,25 @@ async function createIssueIfNotExists(
             // Search by title using filter on client side since API doesn't provide title filter
         });
 
-        const issueExists = issues.some((issue: { title: string; }) => issue.title === issueTitle);
+        // Generate a unique hash for the TODO to check if it already exists
+        const issueExists = issues.some((issue: { body?: string }) =>
+            issue.body?.includes(`<!-- todo-hash: ${todoHash} -->`)
+        );
 
         if (issueExists) {
-            context.log.info(`Issue already exists for: ${issueTitle}, skipping creation.`);
+            context.log.info(`TODO already exists via hash: ${todoHash}, skipping.`);
             return;
         }
+
+        // Nouveau corps de l’issue avec un identifiant unique
+        const body = `**Line ${lineIndex + 1}** of \`${path}\`:\n\n\`${line.trim()}\`\n\n_Commit: ${commit.id}_\n\n<!-- todo-hash: ${todoHash} -->`;
 
         // Create the issue if it doesn't exist
         await context.octokit.issues.create({
             owner: repo.owner,
             repo: repo.repo,
             title: issueTitle,
-            body: `**Line ${lineIndex + 1}** of \`${path}\`:\n\n\`${line.trim()}\`\n\n_Commit: ${commit.id}_`,
+            body: body,
         });
     } catch (error) {
         context.log.error(`Error creating issue for ${path}: ${error}`);
