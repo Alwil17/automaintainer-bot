@@ -2,6 +2,7 @@ import { Probot } from "probot";
 
 export default (app: Probot) => {
   app.log.info("Yay, my app is loaded");
+
   // This will run when the issue is opened.
   // and will create a comment on the issue
   app.on("issues.opened", async (context) => {
@@ -10,7 +11,7 @@ export default (app: Probot) => {
     });
     await context.octokit.issues.createComment(issueComment);
   });
-  // TODO: refactor this method
+
   // This will run when a push event occurs
   // and will create an issue for each TODO found in the pushed files
   app.on("push", async (context) => {
@@ -18,71 +19,127 @@ export default (app: Probot) => {
     const commits = context.payload.commits;
 
     app.log.info(`Push received with ${commits.length} commits`);
+    
+    try {
+      await processCommits(app, context, repo, commits);
+    } catch (error) {
+      app.log.error(`Error processing push event: ${error}`);
+    }
+  });
 
+  // Process each commit in a push event
+  async function processCommits(app: Probot, context: any, repo: any, commits: any[]) {
     for (const commit of commits) {
       const files = [...(commit.added || []), ...(commit.modified || [])];
       app.log.info(`Commit ${commit.id} - files: ${files.join(", ")}`);
 
-      for (const path of files) {
-        try {
-          const res = await context.octokit.repos.getContent({
-            owner: repo.owner,
-            repo: repo.repo,
-            path,
-            ref: commit.id,
-          });
+      await Promise.all(files.map(path => 
+        processFile(app, context, repo, commit, path)
+      ));
+    }
+  }
 
-          if (!("content" in res.data)) continue;
+  // Process a single file to find TODOs
+  async function processFile(app: Probot, context: any, repo: any, commit: any, path: string) {
+    try {
+      const res = await context.octokit.repos.getContent({
+        owner: repo.owner,
+        repo: repo.repo,
+        path,
+        ref: commit.id,
+      });
 
-          const decoded = Buffer.from(res.data.content, "base64").toString("utf-8");
-          const lines = decoded.split("\n");
+      if (!("content" in res.data)) return;
 
-          for (let index = 0; index < lines.length; index++) {
-            const line = lines[index];
-            // Define the TODO identifier
-            // This is the identifier we are looking for in the comments
-            const todoIdentifier: string = "TODO:";
-            // Check if the line contains a TODO comment
-            if (line.includes(`// ${todoIdentifier}`)) {
-              app.log.info(`TODO found at ${path}:${index + 1} - ${line.trim()}`);
+      const decoded = Buffer.from(res.data.content, "base64").toString("utf-8");
+      const lines = decoded.split("\n");
 
-              // Extract the TODO message after "TODO"
-              const todoMessageMatch = line.trim().match(/^\/\/ TODO:\s*(.*)/i);
-              const todoMessage = todoMessageMatch ? todoMessageMatch[1].trim() : "";
+      await processTodosInFile(app, context, repo, commit, path, lines);
+    } catch (error) {
+      app.log.warn(`Failed to read ${path}: ${error}`);
+    }
+  }
 
-              const issueTitle = todoMessage
-                ? `${todoMessage} in ${path}`
-                : `TODO found in ${path}`;
+  // Find and process TODOs in a file's content
+  async function processTodosInFile(
+    app: Probot, 
+    context: any, 
+    repo: any, 
+    commit: any, 
+    path: string, 
+    lines: string[]
+  ) {
+    const todoIdentifier = "TODO:";
 
-              // Check if an issue with this title already exists (open or closed)
-              const { data: issues } = await context.octokit.issues.listForRepo({
-                owner: repo.owner,
-                repo: repo.repo,
-                state: "open", // Check only open issues
-                per_page: 100,
-                // Search by title using filter on client side since API doesn't provide title filter
-              });
-
-              const issueExists = issues.some(issue => issue.title === issueTitle);
-
-              if (issueExists) {
-                app.log.info(`Issue already exists for: ${issueTitle}, skipping creation.`);
-                continue;
-              }
-
-              // Create the issue if it doesn't exist
-              await context.octokit.issues.create({
-                owner: repo.owner,
-                repo: repo.repo,
-                title: issueTitle,
-                body: `**Line ${index + 1}** of \`${path}\`:\n\n\`${line.trim()}\`\n\n_Commit: ${commit.id}_`,
-              });
-            }
-          }
-        } catch (error) {
-          app.log.warn(`Failed to read ${path}: ${error}`);
-        }
+    for (let index = 0; index < lines.length; index++) {
+      const line = lines[index];
+      
+      // Check if the line contains a TODO comment
+      if (line.includes(`// ${todoIdentifier}`)) {
+        app.log.info(`TODO found at ${path}:${index + 1} - ${line.trim()}`);
+        
+        const todoMessage = extractTodoMessage(line);
+        const issueTitle = todoMessage
+          ? `${todoMessage} in ${path}`
+          : `TODO found in ${path}`;
+        
+        await createIssueIfNotExists(
+          app, 
+          context, 
+          repo, 
+          issueTitle, 
+          path, 
+          line, 
+          index, 
+          commit
+        );
       }
     }
-  });
+  }
+
+  // Extract the TODO message from a comment line
+  function extractTodoMessage(line: string): string {
+    const todoMessageMatch = line.trim().match(/^\/\/ TODO:\s*(.*)/i);
+    return todoMessageMatch ? todoMessageMatch[1].trim() : "";
+  }
+
+  // Create a GitHub issue for a TODO if one doesn't already exist
+  async function createIssueIfNotExists(
+    app: Probot,
+    context: any,
+    repo: any,
+    issueTitle: string,
+    path: string,
+    line: string,
+    lineIndex: number,
+    commit: any
+  ) {
+    try {
+      // Check if an issue with this title already exists
+      const { data: issues } = await context.octokit.issues.listForRepo({
+        owner: repo.owner,
+        repo: repo.repo,
+        state: "open", // Check only open issues
+        per_page: 100,
+        // Search by title using filter on client side since API doesn't provide title filter
+      });
+
+      const issueExists = issues.some((issue: { title: string; }) => issue.title === issueTitle);
+
+      if (issueExists) {
+        app.log.info(`Issue already exists for: ${issueTitle}, skipping creation.`);
+        return;
+      }
+
+      // Create the issue if it doesn't exist
+      await context.octokit.issues.create({
+        owner: repo.owner,
+        repo: repo.repo,
+        title: issueTitle,
+        body: `**Line ${lineIndex + 1}** of \`${path}\`:\n\n\`${line.trim()}\`\n\n_Commit: ${commit.id}_`,
+      });
+    } catch (error) {
+      app.log.error(`Error creating issue for ${path}: ${error}`);
+    }
+  }
 };
