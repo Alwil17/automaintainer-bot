@@ -10,7 +10,7 @@ export default (app: Probot) => {
     });
     await context.octokit.issues.createComment(issueComment);
   });
-  // TODO: this should be refactored
+  // TODO: refactor this method
   // This will run when a push event occurs
   // and will create an issue for each TODO found in the pushed files
   app.on("push", async (context) => {
@@ -29,7 +29,7 @@ export default (app: Probot) => {
             owner: repo.owner,
             repo: repo.repo,
             path,
-            ref: commit.id, // read the file at the specific commit
+            ref: commit.id,
           });
 
           if (!("content" in res.data)) continue;
@@ -37,18 +37,30 @@ export default (app: Probot) => {
           const decoded = Buffer.from(res.data.content, "base64").toString("utf-8");
           const lines = decoded.split("\n");
 
-          lines.forEach(async (line, index) => {
+          for (let index = 0; index < lines.length; index++) {
+            const line = lines[index];
             if (line.includes("TODO")) {
               app.log.info(`TODO found at ${path}:${index + 1} - ${line.trim()}`);
 
+              // Extract the TODO message after "TODO"
+              const todoMessageMatch = line.match(/TODO[:\s]*(.*)/i);
+              const todoMessage = todoMessageMatch ? todoMessageMatch[1].trim() : "";
+
+              const issueTitle = todoMessage
+                ? `TODO: ${todoMessage} in ${path}`
+                : `TODO found in ${path}`;
+
+              
+
+              // Create the issue if it doesn't exist
               await context.octokit.issues.create({
                 owner: repo.owner,
                 repo: repo.repo,
-                title: `TODO found in ${path}`,
+                title: issueTitle,
                 body: `**Line ${index + 1}** of \`${path}\`:\n\n\`${line.trim()}\`\n\n_Commit: ${commit.id}_`,
               });
             }
-          });
+          }
         } catch (error) {
           app.log.warn(`Failed to read ${path}: ${error}`);
         }
