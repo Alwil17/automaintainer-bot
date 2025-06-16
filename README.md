@@ -5,7 +5,7 @@
 ## ✨ Features
 
 ### ✅ TODO Detection & Issue Creation
-- Scans for `// TODO:` comments on every `push`.
+- Scans for `TODO` comments on every `push`.
 - Creates a GitHub Issue per TODO if it doesn't already exist.
 - Issues include file path, line number, and commit reference.
 
@@ -101,7 +101,7 @@ Contributions are welcome! If you have suggestions, bug reports, or want to add 
 
 ## 📄 License
 
-[ISC](LICENSE) © 2025 alwil17
+[ISC](LICENSE) © 2025 Alwil17
 
 ## 🙋 FAQ
 
