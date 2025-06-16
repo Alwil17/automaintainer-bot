@@ -124,7 +124,6 @@ async function processTodosInFile(
  * @param line - The line of code to extract the TODO message from.
  * @returns The extracted TODO message, or an empty string if no message is found.
  */
-
 function extractTodoMessage(line: string): string {
     const todoMessageMatch = line.trim().match(/^\/\/ TODO:\s*(.*)/i);
     return todoMessageMatch ? todoMessageMatch[1].trim() : "";
