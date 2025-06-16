@@ -10,6 +10,13 @@ export default (app: Probot) => {
       body: "Thanks for opening this issue!",
     });
     await context.octokit.issues.createComment(issueComment);
+
+    // Auto-labeling
+    const labelsToAdd = ["triage"]; // change this as needed
+    await context.octokit.issues.addLabels({
+      ...context.issue(),
+      labels: labelsToAdd,
+    });
   });
 
   // This will run when a push event occurs
@@ -19,7 +26,7 @@ export default (app: Probot) => {
     const commits = context.payload.commits;
 
     app.log.info(`Push received with ${commits.length} commits`);
-    
+
     try {
       await processCommits(app, context, repo, commits);
     } catch (error) {
@@ -33,7 +40,7 @@ export default (app: Probot) => {
       const files = [...(commit.added || []), ...(commit.modified || [])];
       app.log.info(`Commit ${commit.id} - files: ${files.join(", ")}`);
 
-      await Promise.all(files.map(path => 
+      await Promise.all(files.map(path =>
         processFile(app, context, repo, commit, path)
       ));
     }
@@ -62,35 +69,35 @@ export default (app: Probot) => {
 
   // Find and process TODOs in a file's content
   async function processTodosInFile(
-    app: Probot, 
-    context: any, 
-    repo: any, 
-    commit: any, 
-    path: string, 
+    app: Probot,
+    context: any,
+    repo: any,
+    commit: any,
+    path: string,
     lines: string[]
   ) {
     const todoIdentifier = "TODO:";
 
     for (let index = 0; index < lines.length; index++) {
       const line = lines[index];
-      
+
       // Check if the line contains a TODO comment
       if (line.includes(`// ${todoIdentifier}`)) {
         app.log.info(`TODO found at ${path}:${index + 1} - ${line.trim()}`);
-        
+
         const todoMessage = extractTodoMessage(line);
         const issueTitle = todoMessage
           ? `${todoMessage} in ${path}`
           : `TODO found in ${path}`;
-        
+
         await createIssueIfNotExists(
-          app, 
-          context, 
-          repo, 
-          issueTitle, 
-          path, 
-          line, 
-          index, 
+          app,
+          context,
+          repo,
+          issueTitle,
+          path,
+          line,
+          index,
           commit
         );
       }
