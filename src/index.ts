@@ -47,7 +47,7 @@ export default (app: Probot) => {
               app.log.info(`TODO found at ${path}:${index + 1} - ${line.trim()}`);
 
               // Extract the TODO message after "TODO"
-              const todoMessageMatch = line.match(/^\/\/ TODO:(.*)/i);
+              const todoMessageMatch = line.match(/^\/\/ TODO:\s*(.*)/i);
               app.log.info(`Extracting TODO message from line: ${line.trim()}`);
               const todoMessage = todoMessageMatch ? todoMessageMatch[1].trim() : "";
               app.log.info(`TODO message: ${todoMessage}`);
