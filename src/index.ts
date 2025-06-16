@@ -46,6 +46,26 @@ export default (app: Probot) => {
     }
   });
 
+  // This will run when a pull request is opened
+  // and will add labels to the pull request
+  app.on("pull_request.opened", async (context) => {
+    const prTitle = context.payload.pull_request.title.toLowerCase();
+    const labelsToAdd: string[] = [];
+
+    if (prTitle.includes("chore")) labelsToAdd.push("chore");
+    if (prTitle.includes("docs")) labelsToAdd.push("documentation");
+    if (prTitle.includes("refactor")) labelsToAdd.push("refactor");
+
+    if (labelsToAdd.length > 0) {
+      await context.octokit.issues.addLabels({
+        owner: context.payload.repository.owner.login,
+        repo: context.payload.repository.name,
+        issue_number: context.payload.pull_request.number,
+        labels: labelsToAdd,
+      });
+    }
+  });
+
   // Process each commit in a push event
   async function processCommits(app: Probot, context: any, repo: any, commits: any[]) {
     for (const commit of commits) {
