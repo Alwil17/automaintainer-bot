@@ -14,7 +14,7 @@ import { ensureLabelsExist } from "../utils/labelManager.js";
  */
 export default async function handleIssuesOpened(context: Context) {
   const issueComment = context.issue({
-    body: "Thanks for opening this issue!",
+    body: "Thanks for opening this issue!\nThis issue was created automatically based on a TODO found in code.",
   });
 
   await context.octokit.issues.createComment(issueComment);
