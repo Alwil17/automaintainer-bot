@@ -1,6 +1,7 @@
 import { Probot } from "probot";
 
 export default (app: Probot) => {
+  // TODO: enhance this method
   // This will run when the issue is opened
   // and will create a comment on the issue
   app.on("issues.opened", async (context) => {
