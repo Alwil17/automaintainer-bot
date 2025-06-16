@@ -12,11 +12,23 @@ export default (app: Probot) => {
     await context.octokit.issues.createComment(issueComment);
 
     // Auto-labeling
-    const labelsToAdd = ["triage"]; // change this as needed
-    await context.octokit.issues.addLabels({
-      ...context.issue(),
-      labels: labelsToAdd,
-    });
+    const title = context.payload.issue.title.toLowerCase();
+
+    const labelsToAdd: string[] = ["triage"];
+
+    if (title.includes("bug")) {
+      labelsToAdd.push("bug");
+    }
+    if (title.includes("feature") || title.includes("enhancement")) {
+      labelsToAdd.push("enhancement");
+    }
+
+    if (labelsToAdd.length > 0) {
+      await context.octokit.issues.addLabels({
+        ...context.issue(),
+        labels: labelsToAdd,
+      });
+    }
   });
 
   // This will run when a push event occurs
