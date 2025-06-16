@@ -1,5 +1,31 @@
 import { Probot } from "probot";
 
+async function ensureLabelExists(context: any, label: string) {
+  const { owner, repo } = context.repo();
+
+  try {
+    await context.octokit.issues.getLabel({
+      owner,
+      repo,
+      name: label,
+    });
+  } catch (error: any) {
+    if (error.status === 404) {
+      // Create the label if it does not exist
+      await context.octokit.issues.createLabel({
+        owner,
+        repo,
+        name: label,
+        color: "ededed", // You can customize label colors
+        description: `Auto-generated label: ${label}`,
+      });
+    } else {
+      throw error; // re-throw if it's another error
+    }
+  }
+}
+
+
 export default (app: Probot) => {
   app.log.info("Yay, my app is loaded");
 
@@ -24,6 +50,9 @@ export default (app: Probot) => {
     }
 
     if (labelsToAdd.length > 0) {
+      for (const label of labelsToAdd) {
+        await ensureLabelExists(context, label); // Ensure label exists before applying
+      }
       await context.octokit.issues.addLabels({
         ...context.issue(),
         labels: labelsToAdd,
@@ -57,6 +86,10 @@ export default (app: Probot) => {
     if (prTitle.includes("refactor")) labelsToAdd.push("refactor");
 
     if (labelsToAdd.length > 0) {
+      for (const label of labelsToAdd) {
+        await ensureLabelExists(context, label); // Ensure label exists before applying
+      }
+
       await context.octokit.issues.addLabels({
         owner: context.payload.repository.owner.login,
         repo: context.payload.repository.name,
