@@ -43,7 +43,7 @@ export default (app: Probot) => {
             // This is the identifier we are looking for in the comments
             const todoIdentifier: string = "TODO:";
             // Check if the line contains a TODO comment
-            if (line.includes(`// ${todoIdentifier}:`) || line.includes(`// ${todoIdentifier}: `)) {
+            if (line.includes(`// ${todoIdentifier}:`)) {
               app.log.info(`TODO found at ${path}:${index + 1} - ${line.trim()}`);
 
               // Extract the TODO message after "TODO"
