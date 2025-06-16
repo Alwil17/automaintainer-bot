@@ -2,7 +2,7 @@ import { Probot } from "probot";
 
 export default (app: Probot) => {
   app.log.info("Yay, my app is loaded");
-  // This will run when the issue is opened
+  // This will run when the issue is opened.
   // and will create a comment on the issue
   app.on("issues.opened", async (context) => {
     const issueComment = context.issue({
