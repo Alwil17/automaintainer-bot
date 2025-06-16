@@ -43,11 +43,11 @@ export default (app: Probot) => {
               app.log.info(`TODO found at ${path}:${index + 1} - ${line.trim()}`);
 
               // Extract the TODO message after "TODO"
-              const todoMessageMatch = line.match(/^\/\/ TODO: (.*)/i);
+              const todoMessageMatch = line.match(/^\/\/ TODO:(.*)/i);
               const todoMessage = todoMessageMatch ? todoMessageMatch[1].trim() : "";
 
               const issueTitle = todoMessage
-                ? `TODO: ${todoMessage} in ${path}`
+                ? `${todoMessage} in ${path}`
                 : `TODO found in ${path}`;
 
               // Check if an issue with this title already exists (open or closed)
