@@ -1,5 +1,15 @@
 import { Probot } from "probot";
 
+const labelColors: Record<string, string> = {
+  bug: "d73a4a",
+  enhancement: "a2eeef",
+  feature: "0e8a16",
+  refactor: "cfd3d7",
+  chore: "eeeeee",
+  documentation: "0075ca",
+  triage: "fbca04",
+};
+
 async function ensureLabelExists(context: any, label: string) {
   const { owner, repo } = context.repo();
 
@@ -11,16 +21,15 @@ async function ensureLabelExists(context: any, label: string) {
     });
   } catch (error: any) {
     if (error.status === 404) {
-      // Create the label if it does not exist
       await context.octokit.issues.createLabel({
         owner,
         repo,
         name: label,
-        color: "ededed", // You can customize label colors
+        color: labelColors[label] || "ededed", // default if unknown
         description: `Auto-generated label: ${label}`,
       });
     } else {
-      throw error; // re-throw if it's another error
+      throw error;
     }
   }
 }
