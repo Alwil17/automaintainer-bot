@@ -16,8 +16,11 @@ export default (app: Probot) => {
     const repo = context.repo();
     const commits = context.payload.commits;
 
+    context.log.info(`Push received with ${commits.length} commits`);
+
     for (const commit of commits) {
       const files = [...(commit.added || []), ...(commit.modified || [])];
+      context.log.info(`Commit ${commit.id} - files: ${files.join(", ")}`);
 
       for (const path of files) {
         try {
@@ -35,6 +38,8 @@ export default (app: Probot) => {
 
           lines.forEach(async (line, index) => {
             if (line.includes("TODO")) {
+              context.log.info(`TODO found at ${path}:${index + 1} - ${line.trim()}`);
+
               await context.octokit.issues.create({
                 owner: repo.owner,
                 repo: repo.repo,
