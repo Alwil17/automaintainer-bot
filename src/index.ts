@@ -39,7 +39,7 @@ export default (app: Probot) => {
 
           for (let index = 0; index < lines.length; index++) {
             const line = lines[index];
-            if (line.includes("// TODO: ")) {
+            if (line.includes("// TODO:") || line.includes("// TODO: ")) {
               app.log.info(`TODO found at ${path}:${index + 1} - ${line.trim()}`);
 
               // Extract the TODO message after "TODO"
