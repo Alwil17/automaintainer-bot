@@ -50,7 +50,21 @@ export default (app: Probot) => {
                 ? `TODO: ${todoMessage} in ${path}`
                 : `TODO found in ${path}`;
 
-              
+              // Check if an issue with this title already exists (open or closed)
+              const { data: issues } = await context.octokit.issues.listForRepo({
+                owner: repo.owner,
+                repo: repo.repo,
+                state: "all",
+                per_page: 100,
+                // Search by title using filter on client side since API doesn't provide title filter
+              });
+
+              const issueExists = issues.some(issue => issue.title === issueTitle);
+
+              if (issueExists) {
+                app.log.info(`Issue already exists for: ${issueTitle}, skipping creation.`);
+                continue;
+              }
 
               // Create the issue if it doesn't exist
               await context.octokit.issues.create({
