@@ -1,7 +1,4 @@
-import { Probot } from "probot";
+import { createNodeMiddleware, createProbot } from "probot";
 import appHandler from "./handlers/app.js";
 
-export default (app: Probot) => {
-  appHandler(app);
-};
-
+export default createNodeMiddleware(appHandler, { probot: createProbot() });
