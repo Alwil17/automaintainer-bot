@@ -24,7 +24,7 @@ export default async function handleIssuesOpened(context: Context) {
     throw new Error("Payload does not contain issue information.");
   }
   const title = context.payload.issue.title.toLowerCase();
-  const labels = ["triage"];
+  const labels = ["needs-triage"];
 
   if (title.includes("bug")) labels.push("bug");
   if (title.includes("feature") || title.includes("enhancement")) labels.push("enhancement");
