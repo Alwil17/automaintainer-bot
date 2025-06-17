@@ -130,7 +130,7 @@ name: AutoMaintainer-bot
 url: https://github.com/apps/automaintainer-bot
 
 # A description of the GitHub App.
-description: A github auto maintainer bot app
+description: A GitHub App that extracts TODOs from commits and creates corresponding GitHub issues automatically.
 
 # Set to true when your GitHub App is available to the public or false when it is only accessible to the owner of the app.
 # Default: true
