@@ -1,6 +1,6 @@
 import crypto from "crypto";
+import { AutoMaintainerConfig, loadRepoConfig } from "./config.js";
 
-const todoIdentifier = "TODO:";
 
 /**
  * Generates a SHA-1 hash for a TODO comment.
@@ -30,12 +30,14 @@ function generateTodoHash(path: string, todoContent: string): string {
  * @param commits - An array of commit objects to process.
  */
 export async function processCommits(context: any, repo: any, commits: any[]) {
+    const config = await loadRepoConfig(context);
+
     for (const commit of commits) {
         const files = [...(commit.added ?? []), ...(commit.modified ?? [])];
         context.log.info(`Commit ${commit.id} - files: ${files.join(", ")}`);
 
         await Promise.all(files.map(path =>
-            processFile(context, repo, commit, path)
+            processFile(context, repo, commit, path, config)
         ));
     }
 }
@@ -55,7 +57,7 @@ export async function processCommits(context: any, repo: any, commits: any[]) {
  * @param path - The path to the file within the repository.
  */
 
-async function processFile(context: any, repo: any, commit: any, path: string) {
+async function processFile(context: any, repo: any, commit: any, path: string, config: AutoMaintainerConfig) {
     try {
         const res = await context.octokit.repos.getContent({
             owner: repo.owner,
@@ -69,7 +71,7 @@ async function processFile(context: any, repo: any, commit: any, path: string) {
         const decoded = Buffer.from(res.data.content, "base64").toString("utf-8");
         const lines = decoded.split("\n");
 
-        await processTodosInFile(context, repo, commit, path, lines, decoded);
+        await processTodosInFile(context, repo, commit, path, lines, decoded, config);
     } catch (error) {
         context.log.warn(`Failed to read ${path}: ${error}`);
     }
@@ -92,23 +94,24 @@ async function processTodosInFile(
     commit: any,
     path: string,
     lines: string[],
-    fileContent: string
+    fileContent: string,
+    config: AutoMaintainerConfig
 ) {
     const todoBlockPattern = /\/\*\s*TODO:([^*]*)\*\//g;
-    
+
     // Process single-line TODOs
     for (let index = 0; index < lines.length; index++) {
         const line = lines[index];
-        
+
         // Check if the line contains a inline TODO comment
-        if (line.includes(`// ${todoIdentifier}`)) {
+        if (config.todoMarkers.some(marker => line.includes(`// ${marker}`))) {
             context.log.info(`Single-line TODO found at ${path}:${index + 1} - ${line.trim()}`);
-            
+
             const todoMessage = extractTodoMessage(line);
             const issueTitle = todoMessage
                 ? `${todoMessage} in ${path}`
                 : `TODO found in ${path}`;
-            
+
             await createIssueIfNotExists(
                 context,
                 repo,
@@ -120,24 +123,24 @@ async function processTodosInFile(
             );
         }
     }
-    
+
     // Process block comment TODOs
     let blockMatch;
     while ((blockMatch = todoBlockPattern.exec(fileContent)) !== null) {
         const fullMatch = blockMatch[0];
         const todoContent = blockMatch[1].trim();
-        
+
         // Find line number by counting newlines before the match position
         const contentBeforeMatch = fileContent.substring(0, blockMatch.index);
         const lineNumber = contentBeforeMatch.split('\n').length;
-        
+
         context.log.info(`Block comment TODO found at ${path}:${lineNumber} - ${todoContent}`);
-        
+
         const todoMessage = todoContent.split('\n')[0].trim();
         const issueTitle = todoMessage
             ? `${todoMessage} in ${path}`
             : `TODO found in ${path}`;
-        
+
         await createIssueIfNotExists(
             context,
             repo,
@@ -149,39 +152,42 @@ async function processTodosInFile(
             true
         );
     }
-    
+
     // Process multi-line TODOs (continuing lines after a TODO:)
     let inMultiLineTodo = false;
     let multiLineTodoStart = -1;
     let multiLineTodoContent = "";
-    
+
     for (let index = 0; index < lines.length; index++) {
         const line = lines[index].trim();
-        
-        if (!inMultiLineTodo && line.includes(`// ${todoIdentifier}`)) {
+
+        if (!inMultiLineTodo && config.todoMarkers.some(marker => line.includes(`// ${marker}`))) {
             // Start of a potential multi-line TODO
             inMultiLineTodo = true;
             multiLineTodoStart = index;
             multiLineTodoContent = line;
         } else if (inMultiLineTodo) {
             // Check if this line is a continuation of the TODO
-            if (line.startsWith("//") && !line.includes("TODO:")) {
+            if (
+                line.startsWith("//") &&
+                !config.todoMarkers.some(marker => line.includes(marker))
+            ) {
                 // This is a continuation line
                 multiLineTodoContent += "\n" + line;
             } else {
                 // End of multi-line TODO or not a continuation
                 inMultiLineTodo = false;
-                
+
                 // Only process as multi-line if we actually collected multiple lines
                 if (multiLineTodoContent.includes("\n")) {
                     context.log.info(`Multi-line TODO found at ${path}:${multiLineTodoStart + 1}`);
-                    
+
                     const firstLine = multiLineTodoContent.split("\n")[0];
                     const todoMessage = extractTodoMessage(firstLine);
                     const issueTitle = todoMessage
                         ? `${todoMessage} in ${path}`
                         : `TODO found in ${path}`;
-                    
+
                     await createIssueIfNotExists(
                         context,
                         repo,
@@ -193,9 +199,9 @@ async function processTodosInFile(
                         true
                     );
                 }
-                
+
                 // Check if this line itself starts a new TODO
-                if (line.includes(`// ${todoIdentifier}`)) {
+                if (config.todoMarkers.some(marker => line.includes(`// ${marker}`))) {
                     inMultiLineTodo = true;
                     multiLineTodoStart = index;
                     multiLineTodoContent = line;
@@ -203,17 +209,17 @@ async function processTodosInFile(
             }
         }
     }
-    
+
     // Handle case where file ends with a multi-line TODO
     if (inMultiLineTodo && multiLineTodoContent.includes("\n")) {
         context.log.info(`Multi-line TODO found at end of ${path}:${multiLineTodoStart + 1}`);
-        
+
         const firstLine = multiLineTodoContent.split("\n")[0];
         const todoMessage = extractTodoMessage(firstLine);
         const issueTitle = todoMessage
             ? `${todoMessage} in ${path}`
             : `TODO found in ${path}`;
-        
+
         await createIssueIfNotExists(
             context,
             repo,
@@ -288,7 +294,7 @@ async function createIssueIfNotExists(
         }
 
         // Format the todo content for display
-        const formattedTodo = isMultiLine 
+        const formattedTodo = isMultiLine
             ? "```\n" + todoContent + "\n```"
             : "`" + todoContent.trim() + "`";
 
