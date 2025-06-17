@@ -6,7 +6,7 @@
 
 
 > **AutoMaintainer-bot** is a GitHub App bot designed to help developers automatically manage TODOs in code.  
-Every time you push code, it scans your diffs and extracts TODO comments like:
+Every time you push code, it scans your diffs and extracts TODO comments.
 
 ## ✨ Features
 
