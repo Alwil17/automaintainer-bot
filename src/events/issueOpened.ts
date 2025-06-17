@@ -14,7 +14,7 @@ import { ensureLabelsExist } from "../utils/labelManager.js";
  */
 export default async function handleIssuesOpened(context: Context) {
   const issueComment = context.issue({
-    body: "Thanks for opening this issue!",
+    body: "Thanks for opening this issue!\nThis issue was created automatically based on a TODO found in code.",
   });
 
   await context.octokit.issues.createComment(issueComment);
@@ -24,7 +24,7 @@ export default async function handleIssuesOpened(context: Context) {
     throw new Error("Payload does not contain issue information.");
   }
   const title = context.payload.issue.title.toLowerCase();
-  const labels = ["triage"];
+  const labels = ["needs-triage"];
 
   if (title.includes("bug")) labels.push("bug");
   if (title.includes("feature") || title.includes("enhancement")) labels.push("enhancement");
