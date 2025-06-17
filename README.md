@@ -1,6 +1,12 @@
-# AutoMaintainer
+# 🤖 AutoMaintainer-bot
 
-> A GitHub App built with [Probot](https://github.com/probot/probot) that automates repository maintenance tasks.
+[![CI](https://github.com/Alwil17/automaintainer-bot/actions/workflows/deploy.yml/badge.svg)](https://github.com/Alwil17/automaintainer-bot/actions)
+[![Docker Pulls](https://img.shields.io/docker/pulls/alwil17/automaintainer-bot)](https://hub.docker.com/r/alwil17/automaintainer-bot)
+[![License](https://img.shields.io/github/license/Alwil17/automaintainer-bot)](LICENSE)
+
+
+> **AutoMaintainer-bot** is a GitHub App bot designed to help developers automatically manage TODOs in code.  
+Every time you push code, it scans your diffs and extracts TODO comments like:
 
 ## ✨ Features
 
@@ -8,6 +14,8 @@
 - Scans for `TODO` comments on every `push`.
 - Creates a GitHub Issue per TODO if it doesn't already exist.
 - Issues include file path, line number, and commit reference.
+- Supports single-line, block, and multi-line TODOs
+- Avoids duplicates with content hashing
 
 ### 🏷️ Auto-labeling
 - Adds contextual labels to issues based on keywords (e.g., `bug`, `feature`, `enhancement`).
