@@ -2,7 +2,7 @@
 FROM node:20-slim AS build
 WORKDIR /usr/src/app
 COPY package*.json tsconfig.json ./
-RUN npm ci --force
+RUN npm install --force
 COPY . .
 # Compile le TypeScript → génère lib/index.js
 RUN npm run build
