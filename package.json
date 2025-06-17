@@ -5,7 +5,7 @@
   "description": "A github auto maintainer bot app",
   "author": "alwil17",
   "license": "ISC",
-  "homepage": "https://github.com//",
+  "homepage": "https://github.com/apps/automaintainer-bot",
   "keywords": [
     "probot",
     "github",
@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^20.0.0",
     "nock": "^14.0.5",
     "smee-client": "^2.0.0",
