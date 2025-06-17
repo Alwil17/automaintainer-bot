@@ -82,8 +82,17 @@ docker run -e APP_ID=<app-id> -e PRIVATE_KEY="<pem-value>" automaintainer
 
 ## 🔧 Configuration
 
-- TODO detection and label rules are currently defined in code.
-- Future versions may support external config files (e.g., `.auto-maintainerrc`).
+To customize the bot, create a `.github/auto-maintainer.yml` file in your repository:
+
+```yaml
+todoMarkers:
+  - TODO:
+  - FIXME:
+defaultLabels:
+  - triage
+  - needs-review
+autoCloseResolved: true
+```
 
 ## 🧩 Extending
 
