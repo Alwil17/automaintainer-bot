@@ -2,8 +2,7 @@
 FROM node:20-slim AS build
 WORKDIR /usr/src/app
 COPY package*.json tsconfig.json ./
-RUN npm ci --production
-RUN npm cache clean --force
+RUN npm ci --force
 ENV NODE_ENV=production
 COPY . .
 # Compile le TypeScript → génère lib/index.js
