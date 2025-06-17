@@ -1,0 +1,7 @@
+todoMarkers:
+  - TODO:
+  - FIXME:
+defaultLabels:
+  - triage
+  - needs-review
+autoCloseResolved: false
