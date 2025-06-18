@@ -6,7 +6,8 @@ export interface AutoMaintainerConfig {
   defaultLabels: string[];       // e.g., ["triage"]
   autoCloseResolved: boolean;    // For later use
   plan?: string;                 // Marketplace plan information
-  welcomeMessage?: string;       // Message de bienvenue personnalisé
+  welcomeMessage?: string;       // Message de bienvenue personnalisé pour les issues
+  welcomePrMessage?: string;     // Message de bienvenue personnalisé pour les PRs
 }
 
 const defaultConfig: AutoMaintainerConfig = {
