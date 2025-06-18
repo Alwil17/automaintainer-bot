@@ -1,4 +1,4 @@
-name: Deploy
+name: Deploy To Google Cloud Functions
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  deploy-gcf:
     name: Deploy to Google Cloud Functions
     runs-on: ubuntu-latest
 
