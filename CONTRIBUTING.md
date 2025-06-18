@@ -12,6 +12,13 @@ Please note that this project is released with a [Contributor Code of Conduct][c
 
 If you have suggestions for how this project could be improved, or want to report a bug, open an issue! We'd love all and any contributions. If you have questions, too, we'd love to hear them.
 
+**First-time contributors:**  
+If this is your first issue or pull request, you'll receive a welcome message from our bot. We're happy to help you get started!
+
+**Good first issue:**  
+If you're looking for a place to start, look for issues labeled `good first issue`.  
+If you open an issue or PR and mention "good first issue" in the title or body, our bot will automatically add the label for you.
+
 We'd also love PRs. If you're thinking of a large PR, we advise opening up an issue first to talk about it, though! Look at the links below if you're not sure how to open a PR.
 
 ## Submitting a pull request
@@ -29,6 +36,9 @@ Here are a few things you can do that will increase the likelihood of your pull 
 - Write and update tests.
 - Keep your changes as focused as possible. If there are multiple changes you would like to make that are not dependent upon each other, consider submitting them as separate pull requests.
 - Write a [good commit message](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html).
+- If your PR fixes a TODO or is related to a specific issue, mention it in your PR description.
+- Use labels when possible to help maintainers triage and review your contribution.
+- For new contributors, don't hesitate to ask for help or clarification.
 
 Work in Progress pull requests are also welcome to get feedback early on, or if there is something blocked you.
 
