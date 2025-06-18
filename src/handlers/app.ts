@@ -3,6 +3,7 @@ import handleIssuesOpened from "../events/issueOpened.js";
 import handlePush from "../events/push.js";
 import handlePullRequestOpened from "../events/pullRequestOpened.js";
 import handleMarketplacePurchase from "../events/marketplacePurchase.js";
+import handleMemberAdded from "../events/member.js";
 
 /**
  * Registers all event handlers with the Probot app.
@@ -16,4 +17,5 @@ export default (app: Probot) => {
   app.on("push", handlePush);
   app.on("pull_request.opened", handlePullRequestOpened);
   app.on("marketplace_purchase", handleMarketplacePurchase);
+  app.on("member.added", handleMemberAdded);
 }
