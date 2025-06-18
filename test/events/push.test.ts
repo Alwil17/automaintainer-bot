@@ -1,6 +1,6 @@
 import nock from 'nock';
 import { Probot, ProbotOctokit } from 'probot';
-import myProbotApp from '../../src/index';
+import myProbotApp from '../../src/probot-app';
 import pushEvent from '../fixtures/push.json';
 import fs from 'fs';
 import path from 'path';
