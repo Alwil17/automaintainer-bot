@@ -13,7 +13,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "start": "probot run ./lib/probot-app.js",
+    "start": "probot run ./dist/probot-app.js",
     "test": "vitest"
   },
   "dependencies": {
