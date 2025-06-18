@@ -2,8 +2,7 @@ import { createNodeMiddleware, createProbot } from "probot";
 import appHandler from "./handlers/app.js";
 
 const middleware = createNodeMiddleware(appHandler, {
-  probot: createProbot(),
-  webhooksPath: "/",
+  probot: createProbot()
 });
 
 import { IncomingMessage, ServerResponse } from "http";
@@ -14,3 +13,4 @@ export const probotApp = (req: IncomingMessage, res: ServerResponse) => {
     res.end();
   });
 };
+// TODO: Add a health check endpoint
