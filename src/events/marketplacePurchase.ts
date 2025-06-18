@@ -33,7 +33,7 @@ export default async function handleMarketplacePurchase(
       await handleChanged(context, marketplace_purchase, config);
       break;
     case "pending_change":
-      await handlePendingChange(context, marketplace_purchase, config);
+      await handlePendingChange(context, marketplace_purchase);
       break;
     default:
       context.log.warn(`Unknown marketplace action: ${action}`);
@@ -149,7 +149,7 @@ async function handleChanged(context: Context, purchase: any, config: any): Prom
 /**
  * Handles a pending change to a subscription.
  */
-async function handlePendingChange(context: Context, purchase: any, config: any): Promise<void> {
+async function handlePendingChange(context: Context, purchase: any): Promise<void> {
   const accountId = purchase.account.id;
   const accountLogin = purchase.account.login;
   const pendingPlan = purchase.plan.name;
