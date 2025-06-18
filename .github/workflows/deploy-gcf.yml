@@ -16,16 +16,17 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
         with:
-          project_id: ${{ secrets.PROJECT_ID }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
           service_account_key: ${{ secrets.GCP_SA_KEY }}
           export_default_credentials: true
 
       - name: Deploy function
         uses: google-github-actions/deploy-cloud-functions@v2
         with:
-          name: probotApp
+          name: automaintainer-bot
           runtime: nodejs20
-          entry_point: probotApp
+          entry_point: automaintainer-bot
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
           region: europe-west1
           source_dir: .
           env_vars: |
