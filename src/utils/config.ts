@@ -6,6 +6,8 @@ export interface AutoMaintainerConfig {
   defaultLabels: string[];       // e.g., ["triage"]
   autoCloseResolved: boolean;    // For later use
   plan?: string;                 // Marketplace plan information
+  welcomeMessage?: string;       // Message de bienvenue personnalisé pour les issues
+  welcomePrMessage?: string;     // Message de bienvenue personnalisé pour les PRs
 }
 
 const defaultConfig: AutoMaintainerConfig = {
@@ -48,7 +50,7 @@ export async function loadRepoConfig(context: Context): Promise<AutoMaintainerCo
  */
 export function hasFeatureAccess(config: AutoMaintainerConfig, feature: string): boolean {
   // If no plan is specified, assume it's the free tier
-  const plan = config.plan || "free";
+  const plan = config.plan ?? "free";
   
   // Basic features available to all plans
   const basicFeatures = ["todo-detection", "basic-labels"];
