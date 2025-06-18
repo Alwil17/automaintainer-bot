@@ -26,10 +26,23 @@ export default async function handleIssuesOpened(context: Context) {
     throw new Error("Payload does not contain issue information.");
   }
   const title = context.payload.issue.title.toLowerCase();
+  const body = context.payload.issue.body?.toLowerCase() || "";
   const labels = ["needs-triage"];
 
   if (title.includes("bug")) labels.push("bug");
   if (title.includes("feature") || title.includes("enhancement")) labels.push("enhancement");
+  // Ajout du label "good first issue" si le titre ou le corps contient cette mention
+  if (title.includes("good first issue") || body.includes("good first issue")) labels.push("good first issue");
+
+  // Vérifier si c'est le premier issue de l'utilisateur et ajouter le label "first-time"
+  let isFirst = false;
+  if (context.payload.issue.user) {
+    const username = context.payload.issue.user.login;
+    isFirst = await isFirstIssue(context, username);
+    if (isFirst) {
+      labels.push("first-time");
+    }
+  }
 
   await ensureLabelsExist(context, labels);
 
@@ -39,13 +52,8 @@ export default async function handleIssuesOpened(context: Context) {
   });
 
   // Vérifier si c'est le premier issue de l'utilisateur et poster un message de bienvenue
-  if (context.payload.issue.user) {
-    const username = context.payload.issue.user.login;
-    const isFirst = await isFirstIssue(context, username);
-    
-    if (isFirst) {
-      context.log.info(`Premier issue détecté pour l'utilisateur ${username}`);
-      await postWelcomeComment(context, context.payload.issue.number);
-    }
+  if (isFirst && context.payload.issue.user) {
+    context.log.info(`Premier issue détecté pour l'utilisateur ${context.payload.issue.user.login}`);
+    await postWelcomeComment(context, context.payload.issue.number);
   }
 }
