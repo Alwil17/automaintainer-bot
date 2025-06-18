@@ -15,7 +15,7 @@ const defaultConfig: AutoMaintainerConfig = {
 
 export async function loadRepoConfig(context: Context): Promise<AutoMaintainerConfig> {
   try {
-    const configPath = ".github/auto-maintainer.yml";
+    const configPath = "./.github/auto-maintainer.yml";
     const res = await context.octokit.repos.getContent({
       owner: context.repo().owner,
       repo: context.repo().repo,
