@@ -1,8 +1,7 @@
 import { createNodeMiddleware, createProbot } from "probot";
 import appHandler from "./handlers/app.js";
 const middleware = createNodeMiddleware(appHandler, {
-    probot: createProbot(),
-    webhooksPath: "/",
+    probot: createProbot()
 });
 export const probotApp = (req, res) => {
     middleware(req, res, () => {
