@@ -28,16 +28,12 @@ jobs:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
       - name: Deploy to GCF
-        uses: google-github-actions/deploy-cloud-functions@v2
-        with:
-          name: automaintainer-bot
-          runtime: nodejs20
-          entry_point: probotApp
-          region: europe-west1
-          source_dir: ./
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-          env_vars: |
-            APP_ID=${{ secrets.APP_ID }}
-            PRIVATE_KEY=${{ secrets.PRIVATE_KEY }}
-            WEBHOOK_SECRET=${{ secrets.WEBHOOK_SECRET }}
+        run: |
+          gcloud functions deploy automaintainer-bot \
+            --runtime nodejs20 \
+            --allow-unauthenticated \
+            --trigger-http \
+            --entry-point probotApp \
+            --set-env-vars APP_ID="${{secrets.APP_ID}}",PRIVATE_KEY="${{secrets.PRIVATE_KEY}}",WEBHOOK_SECRET="${{secrets.WEBHOOK_SECRET}}"
+
 
