@@ -6,10 +6,10 @@ import handlePullRequestOpened from "../events/pullRequestOpened.js";
  *
  * @param {Probot} app - The Probot app to register the event handlers with.
  */
-export default function appHandler(app) {
+export default (app) => {
     app.log.info("AutoMaintainer App Initialized");
     app.on("issues.opened", handleIssuesOpened);
     app.on("push", handlePush);
     app.on("pull_request.opened", handlePullRequestOpened);
-}
+};
 //# sourceMappingURL=app.js.map

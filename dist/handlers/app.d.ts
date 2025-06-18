@@ -4,4 +4,5 @@ import { Probot } from "probot";
  *
  * @param {Probot} app - The Probot app to register the event handlers with.
  */
-export default function appHandler(app: Probot): void;
+declare const _default: (app: Probot) => void;
+export default _default;
