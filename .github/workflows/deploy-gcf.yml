@@ -2,7 +2,7 @@ name: Deploy To Google Cloud Functions
 
 on:
   push:
-    branches: [main]
+    branches: [dev]
   workflow_dispatch:
 
 jobs:
