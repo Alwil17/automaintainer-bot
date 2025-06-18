@@ -28,6 +28,16 @@ export default async function handlePullRequestOpened(context: Context) {
   if (title.startsWith("refactor:")) labels.push("refactor");
   if (title.startsWith("test:")) labels.push("test");
 
+  // Vérifier si c'est la première pull request de l'utilisateur et ajouter le label "first-time"
+  let isFirst = false;
+  if (context.payload.pull_request.user) {
+    const username = context.payload.pull_request.user.login;
+    isFirst = await isFirstPullRequest(context, username);
+    if (isFirst) {
+      labels.push("first-time");
+    }
+  }
+
   await ensureLabelsExist(context, labels);
 
   await context.octokit.issues.addLabels({
@@ -36,13 +46,8 @@ export default async function handlePullRequestOpened(context: Context) {
   });
 
   // Vérifier si c'est la première pull request de l'utilisateur et poster un message de bienvenue
-  if (context.payload.pull_request.user) {
-    const username = context.payload.pull_request.user.login;
-    const isFirst = await isFirstPullRequest(context, username);
-
-    if (isFirst) {
-      context.log.info(`Première pull request détectée pour l'utilisateur ${username}`);
-      await postWelcomePrComment(context, context.payload.pull_request.number);
-    }
+  if (isFirst && context.payload.pull_request.user) {
+    context.log.info(`Première pull request détectée pour l'utilisateur ${context.payload.pull_request.user.login}`);
+    await postWelcomePrComment(context, context.payload.pull_request.number);
   }
 }
