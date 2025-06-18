@@ -27,6 +27,7 @@ jobs:
           runtime: nodejs20
           entry_point: automaintainer-bot
           project_id: ${{ secrets.GCP_PROJECT_ID }}
+          credentials: ${{ secrets.GCP_SA_KEY }}
           region: europe-west1
           source_dir: .
           env_vars: |
