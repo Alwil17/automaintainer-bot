@@ -32,7 +32,7 @@ jobs:
         with:
           name: automaintainer-bot
           runtime: nodejs20
-          entry_point: automaintainer-bot
+          entry_point: probotApp
           region: europe-west1
           source_dir: ./
           project_id: ${{ secrets.GCP_PROJECT_ID }}
