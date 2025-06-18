@@ -1,0 +1,37 @@
+{
+  "action": "cancelled",
+  "effective_date": "2023-06-01T00:00:00Z",
+  "sender": {
+    "login": "octocat",
+    "id": 1,
+    "type": "User"
+  },
+  "marketplace_purchase": {
+    "account": {
+      "type": "User",
+      "id": 1,
+      "login": "octocat",
+      "email": "octocat@github.com"
+    },
+    "billing_cycle": "monthly",
+    "unit_count": 1,
+    "on_free_trial": false,
+    "free_trial_ends_on": null,
+    "next_billing_date": null,
+    "plan": {
+      "id": 101,
+      "name": "Pro Plan",
+      "description": "Professional plan with advanced features",
+      "monthly_price_in_cents": 1000,
+      "yearly_price_in_cents": 10000,
+      "price_model": "flat-rate",
+      "has_free_trial": true,
+      "unit_name": null,
+      "bullets": [
+        "Advanced TODO detection",
+        "Custom labels",
+        "Priority support"
+      ]
+    }
+  }
+}
