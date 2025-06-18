@@ -1,0 +1,17 @@
+{
+  "action": "opened",
+  "issue": {
+    "number": 1,
+    "title": "Test issue",
+    "body": "This is a test issue",
+    "user": {
+      "login": "test-user"
+    }
+  },
+  "repository": {
+    "name": "testing-things",
+    "owner": {
+      "login": "hiimbex"
+    }
+  }
+}
