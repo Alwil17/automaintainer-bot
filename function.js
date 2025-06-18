@@ -1,7 +1,7 @@
 import { createNodeMiddleware, createProbot } from "probot";
-import app from "./dist/handlers/app.js";
+import appFn from "./dist/handlers/app.js";
 
-export const probotApp = createNodeMiddleware(app, {
+export const probotApp = createNodeMiddleware(appFn, {
   probot: createProbot(),
   webhooksPath: "/",
 });
