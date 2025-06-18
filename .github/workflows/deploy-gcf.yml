@@ -36,4 +36,8 @@ jobs:
           region: europe-west1
           source_dir: ./
           project_id: ${{ secrets.GCP_PROJECT_ID }}
+          env_vars: |
+            APP_ID=${{ secrets.APP_ID }}
+            PRIVATE_KEY=${{ secrets.PRIVATE_KEY }}
+            WEBHOOK_SECRET=${{ secrets.WEBHOOK_SECRET }}
 
