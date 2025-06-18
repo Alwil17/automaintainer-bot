@@ -21,12 +21,12 @@ export default async function handlePullRequestOpened(context: Context) {
   const labels = ["needs-review"];
 
   // Labels based on conventional commits format
-  if (title.startsWith("fix:") || title.includes("bug")) labels.push("bug");
-  if (title.startsWith("feat:") || title.includes("feature")) labels.push("enhancement");
-  if (title.startsWith("docs:")) labels.push("documentation");
-  if (title.startsWith("chore:")) labels.push("chore");
-  if (title.startsWith("refactor:")) labels.push("refactor");
-  if (title.startsWith("test:")) labels.push("test");
+  if (title.startsWith("fix") || title.includes("bug")) labels.push("bug");
+  if (title.startsWith("feat") || title.includes("feature")) labels.push("enhancement");
+  if (title.startsWith("docs")) labels.push("documentation");
+  if (title.startsWith("chore")) labels.push("chore");
+  if (title.startsWith("refactor")) labels.push("refactor");
+  if (title.startsWith("test")) labels.push("test");
 
   // Vérifier si c'est la première pull request de l'utilisateur et ajouter le label "first-time"
   let isFirst = false;
