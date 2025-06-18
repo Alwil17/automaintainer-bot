@@ -30,11 +30,11 @@ jobs:
       - name: Deploy to GCF
         run: |
           gcloud functions deploy automaintainer-bot \
-            --region europe-west1 \
-            --runtime nodejs20 \
+            --region=europe-west1 \
+            --runtime=nodejs20 \
             --allow-unauthenticated \
             --trigger-http \
-            --entry-point probotApp \
+            --entry-point=probotApp \
             --set-env-vars APP_ID="${{secrets.APP_ID}}",PRIVATE_KEY="${{secrets.PRIVATE_KEY}}",WEBHOOK_SECRET="${{secrets.WEBHOOK_SECRET}}"
 
 
