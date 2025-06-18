@@ -1,6 +1,6 @@
 // function.js
 const { Probot } = require("probot");
-const appFn = require("./lib/index"); // ton bot compilé
+const appFn = require("./lib/index");
 const probot = new Probot({});
 
 probot.load(appFn);
