@@ -1,4 +1,7 @@
-const { createNodeMiddleware, createProbot } = require("probot");
-const app = require("./lib/handlers/app");
+import { createNodeMiddleware, createProbot } from "probot";
+import app from "./lib/handlers/app.js";
 
-exports.probotApp = createNodeMiddleware(app, { probot: createProbot(), webhooksPath: "/" });
+export const probotApp = createNodeMiddleware(app, {
+  probot: createProbot(),
+  webhooksPath: "/",
+});
