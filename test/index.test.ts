@@ -3,7 +3,7 @@
 
 import nock from "nock";
 // Requiring our app implementation
-import myProbotApp from "../src/index.js";
+import myProbotApp from "../src/probot-app.js";
 import { Probot, ProbotOctokit } from "probot";
 import fs from "fs";
 import path from "path";
