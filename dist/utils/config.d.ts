@@ -4,6 +4,8 @@ export interface AutoMaintainerConfig {
     defaultLabels: string[];
     autoCloseResolved: boolean;
     plan?: string;
+    welcomeMessage?: string;
+    welcomePrMessage?: string;
 }
 export declare function loadRepoConfig(context: Context): Promise<AutoMaintainerConfig>;
 /**

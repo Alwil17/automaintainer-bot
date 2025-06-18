@@ -36,7 +36,7 @@ export async function loadRepoConfig(context) {
  */
 export function hasFeatureAccess(config, feature) {
     // If no plan is specified, assume it's the free tier
-    const plan = config.plan || "free";
+    const plan = config.plan ?? "free";
     // Basic features available to all plans
     const basicFeatures = ["todo-detection", "basic-labels"];
     if (basicFeatures.includes(feature))
