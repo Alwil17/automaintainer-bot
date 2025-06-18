@@ -8,7 +8,7 @@ import handlePullRequestOpened from "../events/pullRequestOpened.js";
  *
  * @param {Probot} app - The Probot app to register the event handlers with.
  */
-export default function appHandler(app: Probot) {
+export default (app: Probot) => {
   app.log.info("AutoMaintainer App Initialized");
 
   app.on("issues.opened", handleIssuesOpened);
