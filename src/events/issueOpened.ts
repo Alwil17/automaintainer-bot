@@ -1,5 +1,6 @@
 import { Context } from "probot";
 import { ensureLabelsExist } from "../utils/labelManager.js";
+import { isFirstIssue, postWelcomeComment } from "./welcome.js";
 
 /**
  * Handles the "issues.opened" event.
@@ -9,6 +10,7 @@ import { ensureLabelsExist } from "../utils/labelManager.js";
  * 2. Analyzes the issue title to determine appropriate labels to add, such as "triage", "bug", or "enhancement".
  * 3. Ensures that the determined labels exist in the repository, creating them if necessary.
  * 4. Adds the labels to the issue.
+ * 5. Checks if it's the user's first issue and posts a welcome message if it is.
  * 
  * @param context - The context object provided by Probot, containing information about the event.
  */
@@ -35,4 +37,15 @@ export default async function handleIssuesOpened(context: Context) {
     ...context.issue(),
     labels,
   });
+
+  // Vérifier si c'est le premier issue de l'utilisateur et poster un message de bienvenue
+  if (context.payload.issue.user) {
+    const username = context.payload.issue.user.login;
+    const isFirst = await isFirstIssue(context, username);
+    
+    if (isFirst) {
+      context.log.info(`Premier issue détecté pour l'utilisateur ${username}`);
+      await postWelcomeComment(context, context.payload.issue.number);
+    }
+  }
 }
